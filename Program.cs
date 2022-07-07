@@ -29,14 +29,15 @@ namespace Celones.MicrosoftKeyTool
         internal static int Crunch(FileInfo config, string pattern)
         {
             var generator = new KeyGenerator(pattern);
+            var checker = new KeyChecker(config.FullName);
 
             var stopwatch = Stopwatch.StartNew();
             for (int i = 1; i <= generator.PossibilitiesCount; i++)
             {
                 var key = generator.GetNext();
                 Console.Write(key);
-                var status = Interop.Adapter.DecodeKey(key, config.FullName, "XXXXX", out var pid, out var digPid, out var digPid4);
-                Console.WriteLine(" - {0}", status.ToString());
+                var valid = checker.IsValid(key, out var description);
+                Console.WriteLine(" - {0} [{1}]", valid ? "VALID" : "INVALID", description);
 
                 var elapsed = stopwatch.Elapsed;
                 var pace = elapsed / i;
